@@ -2,7 +2,10 @@
 #define LEARNOPENGL_SHADER_HPP
 
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
 #include <string>
@@ -24,10 +27,6 @@ public:
     GLuint get() { return program_; }
     Shader& link();
 
-    void bind(unsigned int location, int value);
-    void bind(unsigned int location, float value);
-    void bind(unsigned int location, const glm::vec4& value);
-    void bind(unsigned int location, const glm::mat4& matrix);
     template<typename T>
     Shader& bind(const std::string& name, T&& value)
     {
@@ -43,6 +42,13 @@ public:
 private:
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
+
+    void bind(unsigned int location, int value);
+    void bind(unsigned int location, float value);
+    void bind(unsigned int location, const glm::vec2& value);
+    void bind(unsigned int location, const glm::vec3& value);
+    void bind(unsigned int location, const glm::vec4& value);
+    void bind(unsigned int location, const glm::mat4& matrix);
 
     GLuint program_;
     GLint status_;
@@ -118,6 +124,16 @@ void Shader::bind(unsigned int location, int value)
 void Shader::bind(unsigned int location, float value)
 {
     glUniform1f(location, value);
+}
+
+void Shader::bind(unsigned int location, const glm::vec2& value)
+{
+    glUniform2f(location, value.x, value.y);
+}
+
+void Shader::bind(unsigned int location, const glm::vec3& value)
+{
+    glUniform3f(location, value.x, value.y, value.z);
 }
 
 void Shader::bind(unsigned int location, const glm::vec4& value)

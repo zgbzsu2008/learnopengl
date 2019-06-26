@@ -26,11 +26,42 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="3-3.frag">
+    <Image Include="awesomeface.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="container.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="freetype.dll">
       <Filter>资源文件</Filter>
     </None>
-    <None Include="3-3.vert">
+    <None Include="mesh.frag">
       <Filter>资源文件</Filter>
     </None>
+    <None Include="mesh.vert">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="text.frag">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="text.vert">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="triangle.frag">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="triangle.vert">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="triangle.geom">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="SIMYOU.TTF">
+      <Filter>资源文件</Filter>
+    </Font>
   </ItemGroup>
 </Project>

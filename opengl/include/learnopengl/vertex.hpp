@@ -1,8 +1,9 @@
-#ifndef LEARNOPENGL_VERTEX
-#define LEARNOPENGL_VERTEX
+#ifndef LEARNOPENGL_VERTEX_HPP
+#define LEARNOPENGL_VERTEX_HPP
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
 #include <vector>
 #include <cassert>
 
@@ -11,85 +12,154 @@ namespace learnopengl {
 class Vertex
 {
 public:
-    Vertex(const float* vertices, int vlen, const int* indices = 0, int len = 0);
+    explicit Vertex(int format = 0);
     ~Vertex();
 
-    void render();
+    template<typename T> // type==0则glBufferSubData否则glBufferData
+    Vertex& bind(const T* buffer, int len, int type = GL_STATIC_DRAW);
+
+    void render(int type = GL_TRIANGLES);
     void setVertexAttrib(int vertex, int color, int texture);
 
     unsigned int getVAO() const { return VAO; }
-    int count() const { return count_; }
+    int size() const { return vblen_ / fromat_; }
 
+    Vertex(Vertex&& v);
+    Vertex& operator=(Vertex&& v);
 private:
+    Vertex(const Vertex&) = delete; // VAO唯一不能拷贝
+    Vertex& operator=(const Vertex&) = delete;
+
+    int fromat_; // Vertex3Color3Texture2 = 3+3+2=8
+    int vblen_, eblen_;
     unsigned int VBO, VAO, EBO;
-    int count_;
-    std::vector<float> vertices_;
-    std::vector<int> indices_;
 };
 
-Vertex::Vertex(const float* vertices, int vlen, const int* indices, int len)
-    : vertices_(vertices, vertices + vlen)
-    , indices_(indices, indices + len)
+Vertex::Vertex(int count)
+    : fromat_(count)
+    , vblen_(0)
+    , eblen_(0)
 {
-    glGenVertexArrays(1, &VAO);
-    glBindVertexArray(VAO);
-    if (!vertices_.empty()) {
+    if (fromat_ > 0) {
+        glGenVertexArrays(1, &VAO);
+        glBindVertexArray(VAO);
+
         glGenBuffers(1, &VBO);
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, vertices_.size() * sizeof(float), vertices_.data(), GL_STATIC_DRAW);
-    }
 
-    if (!indices_.empty()) {
         glGenBuffers(1, &EBO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_.size() * sizeof(float), indices_.data(), GL_STATIC_DRAW);
     }
+}
+
+Vertex::Vertex(Vertex&& v)
+{
+    if (this != &v) {
+        if (v.fromat_ > 0) {
+            fromat_ = v.fromat_;
+            vblen_ = v.vblen_;
+            eblen_ = v.eblen_;
+            VAO = v.VAO;
+            VBO = v.VBO;
+            EBO = v.EBO;
+            v.fromat_ = v.vblen_ = v.eblen_ = 0;
+            v.VAO = v.VBO = v.EBO = 0;
+        }
+    }
+};
+
+Vertex& Vertex::operator=(Vertex&& v)
+{
+    if (this != &v) {
+        if (v.fromat_ > 0) {
+            fromat_ = v.fromat_;
+            vblen_ = v.vblen_;
+            eblen_ = v.eblen_;
+            VAO = v.VAO;
+            VBO = v.VBO;
+            EBO = v.EBO;
+            v.fromat_ = v.vblen_ = v.eblen_ = 0;
+            v.VAO = v.VBO = v.EBO = 0;
+        }
+    }
+    return *this;
 }
 
 Vertex::~Vertex()
 {
-    glDeleteVertexArrays(1, &VAO);
-    if (!vertices_.empty()) {
+    if (fromat_ > 0) {
+        glDeleteVertexArrays(1, &VAO);
         glDeleteBuffers(1, &VBO);
-    }
-
-    if (!indices_.empty()) {
         glDeleteBuffers(1, &EBO);
     }
 }
 
+template<>
+Vertex& Vertex::bind(const int* buffer, int len, int type)
+{
+    if (len > 0) {
+        if (type) {
+            eblen_ = len;
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, len * sizeof(int), buffer, type);
+        } else {
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, len * sizeof(int), buffer);
+        }
+    }
+    return *this;
+}
+
+template<>
+Vertex& Vertex::bind(const float* buffer, int len, int type)
+{
+    if (len > 0) {
+        if (type) {
+            vblen_ = len;
+            glBufferData(GL_ARRAY_BUFFER, len * sizeof(float), buffer, type);
+        } else {
+            glBufferSubData(GL_ARRAY_BUFFER, 0, len * sizeof(float), buffer);
+        }
+    }
+    return *this;
+}
+
 void Vertex::setVertexAttrib(int vertex, int color, int texture)
 {
-    int i = 0, j = 0;
-    count_ = vertex + color + texture;
+    if (fromat_ <= 0) {
+        fromat_ = vertex + color + texture;
+    } else {
+        assert(fromat_ == (vertex + color + texture));
+    }
+
+    int len = sizeof(float);
+    int id = 0, ptr = 0;
     if (vertex) {
-        glVertexAttribPointer(i, vertex, GL_FLOAT, GL_FALSE, count_ * sizeof(float), (void*)j);
-        glEnableVertexAttribArray(i++);
-        j += vertex;
+        glVertexAttribPointer(id, vertex, GL_FLOAT, GL_FALSE, fromat_ * len, (void*)ptr);
+        glEnableVertexAttribArray(id++);
+        ptr += vertex;
     }
-
     if (color) {
-        glVertexAttribPointer(i, color, GL_FLOAT, GL_FALSE, count_ * sizeof(float), (void*)(j * sizeof(float)));
-        glEnableVertexAttribArray(i++);
-        j += color;
+        glVertexAttribPointer(id, color, GL_FLOAT, GL_FALSE, fromat_ * len, (void*)(ptr * len));
+        glEnableVertexAttribArray(id++);
+        ptr += color;
     }
-
     if (texture) {
-        glVertexAttribPointer(i, texture, GL_FLOAT, GL_FALSE, count_ * sizeof(float), (void*)(j * sizeof(float)));
-        glEnableVertexAttribArray(i++);
-        j += texture;
+        glVertexAttribPointer(id, texture, GL_FLOAT, GL_FALSE, fromat_ * len, (void*)(ptr * len));
+        glEnableVertexAttribArray(id++);
+        ptr += texture;
     }
 }
 
-void Vertex::render()
+void Vertex::render(int type)
 {
     glBindVertexArray(VAO);
-    if (!indices_.empty()) {
-        glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, 0);
-    } else {
-        glDrawArrays(GL_TRIANGLES, 0, vertices_.size() / count_);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    if (eblen_ > 0) {
+        glDrawElements(type, eblen_, GL_UNSIGNED_INT, 0);
+    } else if (vblen_ > 0) {
+        glDrawArrays(type, 0, size());
     }
 }
-} // learnopengl
 
-#endif // !LEARNOPENGL_VERTEX
+} // namespace earnopengl
+
+#endif // !LEARNOPENGL_VERTEX_HPP

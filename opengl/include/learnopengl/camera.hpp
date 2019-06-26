@@ -15,7 +15,9 @@ enum Camera_Movement
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 constexpr float YAW = -90.0f; // 摄像机位置在z轴上跟y轴夹角90度
@@ -81,6 +83,13 @@ void Camera::ProcessKeyboard(Camera_Movement direction, float deltaTime)
     }
     if (direction == RIGHT) {
         Position += Right * velocity;
+    }
+    if (direction == UP) {
+        Position += Up * velocity;
+    }
+    if (direction == DOWN) 
+    {
+        Position -= Up * velocity;
     }
 }
 

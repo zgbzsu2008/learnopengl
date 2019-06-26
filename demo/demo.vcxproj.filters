@@ -21,5 +21,38 @@
     <ClCompile Include="..\opengl\src\glad.c">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\opengl\src\std_image.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="awesomeface.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="container.jpg">
+      <Filter>资源文件</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="freetype.dll">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="mesh.frag">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="mesh.vert">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="text.frag">
+      <Filter>资源文件</Filter>
+    </None>
+    <None Include="text.vert">
+      <Filter>资源文件</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="SIMYOU.TTF">
+      <Filter>资源文件</Filter>
+    </Font>
   </ItemGroup>
 </Project>

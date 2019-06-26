@@ -20,7 +20,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{b7883792-bc00-4987-83e6-96574233b861}</ProjectGuid>
+    <ProjectGuid>{e02ffd4b-ca8e-4e01-98ff-d9618426e63e}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>textures</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
@@ -127,7 +127,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;freetype.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -152,8 +153,20 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="4-1.frag" />
-    <None Include="4-1.vert" />
+    <Image Include="awesomeface.png" />
+    <Image Include="container.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="freetype.dll" />
+    <None Include="mesh.frag" />
+    <None Include="mesh.vert" />
+    <None Include="square.frag" />
+    <None Include="square.vert" />
+    <None Include="text.frag" />
+    <None Include="text.vert" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="SIMYOU.TTF" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
